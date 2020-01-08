@@ -1,0 +1,127 @@
+<html>
+
+<head>
+  <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <title>0sprey: Home</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <script src="/javascript/0.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/siofu/client.js"></script>
+  <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin=""></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin=""></script>
+  <script src=" https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script type="text/jsx">
+  class Mee extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.messages = this.messages.bind(this);
+    this.settings = this.settings.bind(this);
+    this.state = { menu_deployed:false, m1:'rotate(45deg)', m2:'rotate(-45deg)', menu:'1px', bb:'1px solid black', hr1_top:'-5px', hr2_top:'-5px', left:'-160px', me_dur:'0.6s', so_dur:'0.3s'};
+  }
+  handleChange(e) {
+    if(this.state.menu_deployed == false)
+    {
+    this.setState({menu_deployed:true, m1:'rotate(0deg)',m2:'rotate(0deg)', menu:'200px', bb:'1px solid white', hr1_top:'37px', hr2_top:'77px', left:'0px', me_dur:'0.3s',so_dur:'0.6s'});
+    }
+    else if(this.state.menu_deployed == true)
+    {
+        this.setState({ menu_deployed:false, m1:'rotate(45deg)', m2:'rotate(-45deg)', menu:'1px', bb:'1px solid black', hr1_top:'-5px', hr2_top:'-5px', left:'-160px', me_dur:'0.6s', so_dur:'0.3s'});
+    }
+  }
+  
+  messages()
+  {
+  var field = this.refs.messages;
+  field.click()
+  }
+  
+  settings()
+  {
+  var field = this.refs.settings;
+  field.click()
+  }
+  render() {
+  return(
+  <div>
+  <div className="hitBox" onClick={this.handleChange}/>
+   <div className="m1a"id="m1"style={{transform:this.state.m1}}/>
+   <div className="m2a" id="m2" style={{transform:this.state.m2}}/>
+   <div className="menu" id="menu" style={{height:this.state.menu}}>
+   <center>
+   <div className="separator" id="hr1" style={{borderBottom:this.state.bb, top:this.state.hr1_top}}/>
+   <div className="separator" id="hr2" style={{borderBottom:this.state.bb, top:this.state.hr2_top}}/>
+   <label className="messages" id="msg" onClick={this.messages} style={{left:this.state.left, transitionDuration:this.state.me_dur}}>Messages</label>
+   <label className="settings" id="stn" onClick={this.settings} style={{left:this.state.left, transitionDuration:'0.45s'}}>Settings</label>
+   <button className="so" id="sob" onClick={this.signOut} style={{left:this.state.left, transitionDuration:this.state.so_dur}}>Sign Out</button>
+   <form action="/logout" method="post"><input className="stealth" id="signOut" type="submit"/></form>
+   <form action="/messages" method="post"><input className="stealth" ref="messages" id="messages" type="submit"/></form>
+   <form action="/settings" method="post"><input className="stealth"ref="settings" id="settings" type="submit"/></form>
+   </center>
+   </div>
+   </div>
+  );
+  }  
+}
+ReactDOM.render(<Mee/>, nav);
+  </script>
+  <script>
+    var active = null;
+    document.addEventListener("DOMContentLoaded", async () => {
+      var socket = io.connect();
+      var uploader = new SocketIOFileUpload(socket);
+      uploader.listenOnInput(document.getElementById("siofu_input"));
+      socket.emit('x', "");
+      socket.on('response', a => {
+        var b = JSON.parse(a);
+        if (b.initial_render === false) {
+          $('#r').html(b.content + r.innerHTML);
+        } else {
+          loading.style.display = 'none';
+          $('#r').html(r.innerHTML + b.content);
+        }
+      });
+      socket.on('upload_response', a => {
+        socket.emit('x', "");
+      });
+    }, false);
+    function drop_menu(id) {
+      if (active !== null) {
+        document.getElementById(active + "_drop").style.display = 'none'
+      }
+      active = id;
+      document.getElementById(id + "_drop").style.display = 'block';
+    }
+    function e() {
+      if (document.getElementById(active + "_drop") !== null) {
+        document.getElementById(active + "_drop").style.display = 'none';
+      }
+      active = null
+    }
+  </script>
+</head>
+
+</html>
+
+<body>
+  <div class="main_" id="main">
+  <% if(username !== null){ %><form action='/profile' method='post' name='profile'><label class='unh' name ='username' id = 'username' onclick='profile.submit()' ><%= username %></label></form><% } %>
+    <label class="title3">Home</label>
+    <div class="topNav" id='nav'>
+    </div>
+    <center>
+      <div class="content_standard" onclick="y()">
+        <center>
+          <input class="home_file" id="siofu_input" type="file" />
+          <div class="upload_post_mask">
+            <div class="mask_plus_a"></div>
+            <div class="mask_plus_b"></div>
+          </div>
+          <div class="img_container" id="r"><img id="loading" src="svg/loading-blocks.svg" /></div>
+        </center>
+      </div>
+    </center>
+  </div>
+</body>
